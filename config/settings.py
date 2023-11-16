@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "tailwind",
     "theme",
     "django_browser_reload",
+    "symbi.apps.SymbiConfig",
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "symbi.SymbiUser"
 
 # Tailwind config
 TAILWIND_APP_NAME = "theme"
