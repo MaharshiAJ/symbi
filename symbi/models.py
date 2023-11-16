@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class InterestTag(models.Model):
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=50, unique=True)
 
     class Meta:
         db_table = "interest_tags"
