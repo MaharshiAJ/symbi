@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 import django.views.generic as generic
 from django.contrib.auth.views import LoginView
@@ -7,6 +7,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 
 from .forms import LoginForm, SignupForm
+from .models import SymbiUser
+from posts.models import ActivityPost
 
 
 class HomePageView(generic.TemplateView):
@@ -45,6 +47,28 @@ class SignupView(generic.FormView):
             return render(request, "symbi/signup.html", {"form": form})
 
 
-# @login_required
 class HomePageView(generic.TemplateView):
     template_name = "symbi/home.html"
+
+
+class ProfilePageView(generic.DetailView):
+    model = SymbiUser
+    template_name = "symbi/profile_page.html"
+    context_object_name = "profile"
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(SymbiUser, username=self.kwargs["username"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_posts"] = ActivityPost.objects.filter(poster=self.object)
+        context["active_posts"] = ActivityPost.objects.filter(
+            poster=self.object, status=ActivityPost.PostStatus.PUBLISHED
+        )
+        context["drafted_posts"] = ActivityPost.objects.filter(
+            poster=self.object, status=ActivityPost.PostStatus.DRAFT
+        )
+        context["archived_posts"] = ActivityPost.objects.filter(
+            poster=self.object, status=ActivityPost.PostStatus.ARCHIVED
+        )
+        return context
