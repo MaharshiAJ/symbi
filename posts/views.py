@@ -41,3 +41,31 @@ class PostDetailsView(generic.DetailView):
     context_object_name = "post"
     slug_field = "title"
     slug_url_kwarg = "title"
+
+
+class EditPostView(generic.UpdateView):
+    model = ActivityPost
+    template_name = "posts/edit_post.html"
+    form_class = NewPostForm
+    slug_field = "title"
+    slug_url_kwarg = "title"
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "posts:post_details",
+            kwargs={
+                "poster": self.object.poster.username,
+                "title": self.object.title,
+            },
+        )
+
+    def post(request, *args, **kwargs):
+        pass
+
+
+class DeletePostView(generic.DeleteView):
+    model = ActivityPost
+    template_name = "posts/delete_post.html"
+    slug_field = "title"
+    slug_url_kwarg = "title"
+    success_url = reverse_lazy("posts:home")
