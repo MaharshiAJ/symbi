@@ -993,6 +993,10 @@ select {
   margin-left: 0.25rem;
 }
 
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .block {
   display: block;
 }
