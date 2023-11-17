@@ -52,6 +52,79 @@
                             </div>
                         {% else %}
                             {% comment %} Connect and Chat buttons {% endcomment %}
+                            <div class="flex justify-center mt-5">
+                                {% if connection.status == connection.ConnectionStatus.NOT_CONNECTED %}
+                                    <a href="{% url 'symbi:request_connection' profile.username %}"
+                                       class="w-40 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-green-500 border border-green-500 rounded-lg shadow-sm cursor-pointer hover:text-green-900 bg-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke-width="1.5"
+                                             stroke="currentColor"
+                                             class="w-6 h-6 mr-1">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z" />
+                                        </svg>
+                                        <span class="relative">Connect</span>
+                                    </a>
+                                {% elif connection.status == connection.ConnectionStatus.REQUESTED %}
+                                    <a href="{% url 'symbi:cancel_connection' profile.username %}"
+                                       class="w-40 relative inline-flex items-center justify-center px-5 py-3 overflow-hidden text-base font-medium text-white transition duration-300 ease-out bg-yellow-500 rounded-lg shadow-sm group">
+                                        <span class="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-red-500 group-hover:translate-x-0 ease">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 fill="none"
+                                                 viewBox="0 0 24 24"
+                                                 stroke-width="1.5"
+                                                 stroke="currentColor"
+                                                 class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </span>
+                                        <span class="absolute flex items-center justify-center w-full h-full text-white transition-all duration-300 transform group-hover:translate-x-full ease">Requested</span>
+                                        <span class="relative invisible">Requested</span>
+                                    </a>
+                                {% elif connection.status == connection.ConnectionStatus.CONNECTED %}
+                                    <a href="{% url 'symbi:cancel_connection' profile.username %}"
+                                       class="w-40 relative inline-flex items-center justify-center px-5 py-3 overflow-hidden text-base font-medium text-white transition duration-300 ease-out bg-green-500 rounded-lg shadow-sm group">
+                                        <span class="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-red-500 group-hover:translate-x-0 ease">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 fill="none"
+                                                 viewBox="0 0 24 24"
+                                                 stroke-width="1.5"
+                                                 stroke="currentColor"
+                                                 class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </span>
+                                        <span class="absolute flex items-center justify-center w-full h-full text-white transition-all duration-300 transform group-hover:translate-x-full ease">Connected</span>
+                                        <span class="relative invisible">Connected</span>
+                                    </a>
+                                {% elif connection.status == connection.ConnectionStatus.BLOCKED %}
+                                {% endif %}
+                                <a href="#"
+                                   class="w-40 mx-10 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-blue-500 border border-blue-500 rounded-lg shadow-sm cursor-pointer hover:text-blue-900 bg-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke-width="1.5"
+                                         stroke="currentColor"
+                                         class="w-6 h-6 mr-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                                    </svg>
+                                    <span class="relative">Chat</span>
+                                </a>
+                                <a href="#"
+                                   class="w-40 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-red-500 border border-red-500 rounded-lg shadow-sm cursor-pointer hover:text-red-900 bg-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke-width="1.5"
+                                         stroke="currentColor"
+                                         class="w-6 h-6 mr-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                    <span class="relative">Block</span>
+                                </a>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -140,14 +213,21 @@
                     </script>
                 </div>
             {% else %}
-                <div class="block" id="tab-active-posts">
-                    {% if active_posts %}
-                        {% for post in active_posts %}
-                            {% include "posts/post_card.html" with post=post %}
-                        {% endfor %}
-                    {% else %}
-                        <p>This User Has No Active Posts.</p>
-                    {% endif %}
+                <div div
+                     class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
+                    <div class="px-4 py-5 flex-auto">
+                        <div>
+                            <div class="block">
+                                {% if active_posts %}
+                                    {% for post in active_posts %}
+                                        {% include "posts/post_card.html" with post=post %}
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No Active Posts. You should make one!</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endif %}
         </div>

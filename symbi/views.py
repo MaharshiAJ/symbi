@@ -3,11 +3,11 @@ from django.urls import reverse_lazy
 import django.views.generic as generic
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 
 from .forms import LoginForm, SignupForm
-from .models import SymbiUser
+from .models import Connection, SymbiUser
 from posts.models import ActivityPost
 
 
@@ -61,7 +61,6 @@ class ProfilePageView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user_posts"] = ActivityPost.objects.filter(poster=self.object)
         context["active_posts"] = ActivityPost.objects.filter(
             poster=self.object, status=ActivityPost.PostStatus.PUBLISHED
         )
@@ -71,4 +70,60 @@ class ProfilePageView(generic.DetailView):
         context["archived_posts"] = ActivityPost.objects.filter(
             poster=self.object, status=ActivityPost.PostStatus.ARCHIVED
         )
+        context["connection"] = Connection.get_connection(
+            self.request.user, self.object
+        )
         return context
+
+
+class LogoutView(generic.RedirectView):
+    url = reverse_lazy("symbi:landing")
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super().get(request, *args, **kwargs)
+
+
+class RequestConnection(generic.View):
+    def get(self, request, *args, **kwargs):
+        viewed_user = get_object_or_404(SymbiUser, username=self.kwargs["username"])
+        user = request.user
+
+        if not Connection.are_connected(user, viewed_user):
+            Connection.objects.create(
+                requester=user,
+                receiver=viewed_user,
+                status=Connection.ConnectionStatus.REQUESTED,
+            )
+
+        return redirect(
+            reverse_lazy("symbi:profile", kwargs={"username": viewed_user.username})
+        )
+
+
+class CancelConnection(generic.View):
+    def get(self, request, *args, **kwargs):
+        viewed_user = get_object_or_404(SymbiUser, username=self.kwargs["username"])
+        user = request.user
+
+        if Connection.are_connected(user, viewed_user):
+            Connection.objects.filter(requester=user, receiver=viewed_user).delete()
+
+        return redirect(
+            reverse_lazy("symbi:profile", kwargs={"username": viewed_user.username})
+        )
+
+
+class AcceptConnection(generic.View):
+    def get(self, request, *args, **kwargs):
+        viewed_user = get_object_or_404(SymbiUser, username=self.kwargs["username"])
+        user = request.user
+
+        if Connection.are_connected(user, viewed_user):
+            Connection.objects.filter(requester=viewed_user, receiver=user).update(
+                status=Connection.ConnectionStatus.CONNECTED
+            )
+
+        return redirect(
+            reverse_lazy("symbi:profile", kwargs={"username": viewed_user.username})
+        )

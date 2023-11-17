@@ -41,3 +41,42 @@ class SymbiUser(AbstractUser):
         "full_name",
         "date_of_birth",
     ]
+
+
+class Connection(models.Model):
+    class ConnectionStatus(models.IntegerChoices):
+        NOT_CONNECTED = 1, _("Not Connected")
+        REQUESTED = 2, _("Requested")
+        CONNECTED = 3, _("Connected")
+        BLOCKED = 4, _("Blocked")
+
+    requester = models.ForeignKey(
+        SymbiUser, on_delete=models.CASCADE, related_name="requester"
+    )
+    receiver = models.ForeignKey(
+        SymbiUser, on_delete=models.CASCADE, related_name="receiver"
+    )
+    status = models.IntegerField(
+        choices=ConnectionStatus.choices, default=ConnectionStatus.NOT_CONNECTED
+    )
+    date_connected = models.DateTimeField("date_connected", auto_now_add=True)
+
+    class Meta:
+        unique_together = ["requester", "receiver"]
+
+    @classmethod
+    def are_connected(cls, user1, user2):
+        return cls.objects.filter(
+            (models.Q(requester=user1) & models.Q(receiver=user2))
+            | (models.Q(requester=user2) & models.Q(receiver=user1))
+        ).exists()
+
+    @classmethod
+    def get_connection(cls, user1, user2):
+        return cls.objects.filter(
+            (models.Q(requester=user1) & models.Q(receiver=user2))
+            | (models.Q(requester=user2) & models.Q(receiver=user1))
+        ).first()
+
+    def __str__(self):
+        return f"{self.requester} - {self.receiver}"
