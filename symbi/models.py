@@ -64,6 +64,7 @@ class Connection(models.Model):
     class Meta:
         unique_together = ["requester", "receiver"]
 
+    # Check if two users are connected
     @classmethod
     def are_connected(cls, user1, user2):
         return cls.objects.filter(
@@ -71,12 +72,30 @@ class Connection(models.Model):
             | (models.Q(requester=user2) & models.Q(receiver=user1))
         ).exists()
 
+    # Get all connection objects regardless of who is requester and receiver
     @classmethod
     def get_connection(cls, user1, user2):
         return cls.objects.filter(
             (models.Q(requester=user1) & models.Q(receiver=user2))
             | (models.Q(requester=user2) & models.Q(receiver=user1))
         ).first()
+
+    # Get all connections where the user was the receiver
+    @classmethod
+    def get_pending_connections(cls, user):
+        return (
+            cls.objects.filter(receiver=user)
+            .filter(status=Connection.ConnectionStatus.REQUESTED)
+            .all()
+        )
+
+    # Get all active connections for a user
+    @classmethod
+    def get_active_connections(cls, user):
+        return cls.objects.filter(
+            (models.Q(requester=user) | models.Q(receiver=user))
+            & models.Q(status=Connection.ConnectionStatus.CONNECTED)
+        ).all()
 
     def __str__(self):
         return f"{self.requester} - {self.receiver}"

@@ -11,18 +11,23 @@ urlpatterns = [
     path("profile/<slug:username>", views.ProfilePageView.as_view(), name="profile"),
     path("logout/", views.LogoutView.as_view(), name="logout"),
     path(
-        "connection/accept/<slug:username>",
-        views.AcceptConnection.as_view(),
+        "connection/accept/<slug:requester>/<slug:receiver>",
+        views.AcceptConnectionView.as_view(),
         name="accept_connection",
     ),
     path(
-        "connection/request/<slug:username>",
-        views.RequestConnection.as_view(),
+        "connection/request/<slug:receiver>",
+        views.RequestConnectionView.as_view(),
         name="request_connection",
     ),
     path(
-        "connection/cancel/<slug:username>",
-        views.CancelConnection.as_view(),
+        "connection/cancel/<slug:requester>/<slug:receiver>",
+        views.CancelConnectionView.as_view(),
         name="cancel_connection",
+    ),
+    path(
+        "connections/<slug:username>",
+        views.ConnectionsPageView.as_view(),
+        name="connections",
     ),
 ]

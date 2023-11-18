@@ -54,7 +54,7 @@
                             {% comment %} Connect and Chat buttons {% endcomment %}
                             <div class="flex justify-center mt-5">
                                 {% if connection.status == connection.ConnectionStatus.NOT_CONNECTED %}
-                                    <a href="{% url 'symbi:request_connection' profile.username %}"
+                                    <a href="{% url 'symbi:request_connection' receiver=profile.username %}"
                                        class="w-40 inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-green-500 border border-green-500 rounded-lg shadow-sm cursor-pointer hover:text-green-900 bg-white">
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                              fill="none"
@@ -67,7 +67,7 @@
                                         <span class="relative">Connect</span>
                                     </a>
                                 {% elif connection.status == connection.ConnectionStatus.REQUESTED %}
-                                    <a href="{% url 'symbi:cancel_connection' profile.username %}"
+                                    <a href="{% url 'symbi:cancel_connection' requester=connection.requester.username receiver=connection.receiver.username %}"
                                        class="w-40 relative inline-flex items-center justify-center px-5 py-3 overflow-hidden text-base font-medium text-white transition duration-300 ease-out bg-yellow-500 rounded-lg shadow-sm group">
                                         <span class="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-red-500 group-hover:translate-x-0 ease">
                                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +83,7 @@
                                         <span class="relative invisible">Requested</span>
                                     </a>
                                 {% elif connection.status == connection.ConnectionStatus.CONNECTED %}
-                                    <a href="{% url 'symbi:cancel_connection' profile.username %}"
+                                    <a href="{% url 'symbi:cancel_connection' requester=connection.requester.username receiver=connection.receiver.username %}"
                                        class="w-40 relative inline-flex items-center justify-center px-5 py-3 overflow-hidden text-base font-medium text-white transition duration-300 ease-out bg-green-500 rounded-lg shadow-sm group">
                                         <span class="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-red-500 group-hover:translate-x-0 ease">
                                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -217,13 +217,13 @@
                      class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
                     <div class="px-4 py-5 flex-auto">
                         <div>
-                            <div class="block">
+                            <div class="block border-t border-black">
                                 {% if active_posts %}
                                     {% for post in active_posts %}
                                         {% include "posts/post_card.html" with post=post %}
                                     {% endfor %}
                                 {% else %}
-                                    <p>No Active Posts. You should make one!</p>
+                                    <p class="text-center mt-5">{{ profile.username|capfirst }} has not made any posts.</p>
                                 {% endif %}
                             </div>
                         </div>

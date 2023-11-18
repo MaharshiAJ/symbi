@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="overflow-y-auto">
+        <h1 class="text-2xl font-bold mb-4">Active Connections</h1>
+        {% for active_connection in active_connections %}
+            {% include "symbi/connection_card.html" with connection=active_connection %}
+        {% endfor %}
+    </div>
+    <div class="overflow-y-auto">
+        <h1 class="text-2xl font-bold mb-4">Connection Requests</h1>
+        {% for connection_request in active_requests %}
+            {% include "symbi/connection_card.html" with connection=connection_request %}
+        {% endfor %}
+    </div>
+{% endblock content %}

@@ -84,46 +84,73 @@ class LogoutView(generic.RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class RequestConnection(generic.View):
+class RequestConnectionView(generic.View):
     def get(self, request, *args, **kwargs):
-        viewed_user = get_object_or_404(SymbiUser, username=self.kwargs["username"])
-        user = request.user
+        requester = get_object_or_404(SymbiUser, username=self.request.user)
+        receiver = get_object_or_404(SymbiUser, username=self.kwargs["receiver"])
 
-        if not Connection.are_connected(user, viewed_user):
+        if not Connection.are_connected(user, receiver):
             Connection.objects.create(
-                requester=user,
-                receiver=viewed_user,
+                requester=requester,
+                receiver=receiver,
                 status=Connection.ConnectionStatus.REQUESTED,
             )
 
         return redirect(
-            reverse_lazy("symbi:profile", kwargs={"username": viewed_user.username})
+            reverse_lazy("symbi:profile", kwargs={"username": receiver.username})
         )
 
 
-class CancelConnection(generic.View):
+class CancelConnectionView(generic.View):
     def get(self, request, *args, **kwargs):
-        viewed_user = get_object_or_404(SymbiUser, username=self.kwargs["username"])
-        user = request.user
+        requester = get_object_or_404(SymbiUser, username=self.kwargs["requester"])
+        receiver = get_object_or_404(SymbiUser, username=self.kwargs["receiver"])
 
-        if Connection.are_connected(user, viewed_user):
-            Connection.objects.filter(requester=user, receiver=viewed_user).delete()
+        current_user = get_object_or_404(SymbiUser, username=self.request.user)
 
-        return redirect(
-            reverse_lazy("symbi:profile", kwargs={"username": viewed_user.username})
-        )
+        # Handles redirect differently since requester and receiver can both cancel the connection
+        if current_user == requester and Connection.are_connected(requester, receiver):
+            Connection.objects.filter(requester=requester, receiver=receiver).delete()
+
+            return redirect(
+                reverse_lazy("symbi:profile", kwargs={"username": receiver.username})
+            )
+        elif current_user == receiver and Connection.are_connected(requester, receiver):
+            Connection.objects.filter(requester=requester, receiver=receiver).delete()
+            return redirect(reverse_lazy("symbi:home"))
+
+        return redirect(reverse_lazy("symbi:home"))
 
 
-class AcceptConnection(generic.View):
+class AcceptConnectionView(generic.View):
     def get(self, request, *args, **kwargs):
-        viewed_user = get_object_or_404(SymbiUser, username=self.kwargs["username"])
-        user = request.user
+        requester = get_object_or_404(SymbiUser, username=self.kwargs["requester"])
+        receiver = get_object_or_404(SymbiUser, username=self.kwargs["receiver"])
 
-        if Connection.are_connected(user, viewed_user):
-            Connection.objects.filter(requester=viewed_user, receiver=user).update(
+        if Connection.are_connected(requester, receiver):
+            Connection.objects.filter(requester=requester, receiver=receiver).update(
                 status=Connection.ConnectionStatus.CONNECTED
             )
 
         return redirect(
-            reverse_lazy("symbi:profile", kwargs={"username": viewed_user.username})
+            reverse_lazy("symbi:connections", kwargs={"username": receiver.username})
         )
+
+
+class ConnectionsPageView(generic.DetailView):
+    model = SymbiUser
+    template_name = "symbi/connections_page.html"
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(SymbiUser, username=self.kwargs.get("username"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["current_user"] = self.request.user
+        context["active_requests"] = Connection.get_pending_connections(
+            self.request.user
+        )
+        context["active_connections"] = Connection.get_active_connections(
+            self.request.user
+        )
+        return context
