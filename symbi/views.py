@@ -154,3 +154,20 @@ class ConnectionsPageView(generic.DetailView):
             self.request.user
         )
         return context
+
+
+class DiscoverPageView(generic.ListView):
+    model = ActivityPost
+    template_name = "symbi/discover_page.html"
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+
+        button_action = self.request.GET.get("action")
+
+        if button_action == "clear" or query is None:
+            object_list = ActivityPost.objects.order_by("-timestamp")[:50]
+        else:
+            object_list = ActivityPost.get_posts_by_search(query)
+
+        return object_list

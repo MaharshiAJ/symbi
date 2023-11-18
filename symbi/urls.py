@@ -30,4 +30,5 @@ urlpatterns = [
         views.ConnectionsPageView.as_view(),
         name="connections",
     ),
+    path("discover/", views.DiscoverPageView.as_view(), name="discover"),
 ]

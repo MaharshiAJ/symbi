@@ -34,3 +34,17 @@ class ActivityPost(models.Model):
                 "title": self.title,
             },
         )
+
+    @classmethod
+    def get_posts_by_user(cls, user):
+        return cls.objects.filter(poster=user)
+
+    @classmethod
+    def get_posts_by_search(cls, search_query):
+        return cls.objects.filter(
+            (
+                models.Q(title__icontains=search_query)
+                | models.Q(description__icontains=search_query)
+            )
+            & models.Q(status=ActivityPost.PostStatus.PUBLISHED)
+        )
