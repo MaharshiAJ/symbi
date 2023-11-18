@@ -139,3 +139,6 @@ INTERNAL_IPS = {
 }
 # Uncomment if having issues with not being able to find npm cmd path
 NPM_BIN_PATH = config("NPM_BIN_PATH")
+
+# Success url in views does not accurately redirect to the home page
+LOGIN_REDIRECT_URL = "symbi:home"
