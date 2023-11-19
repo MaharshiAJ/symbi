@@ -22,4 +22,5 @@ urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path("", include("symbi.urls")),
     path("posts/", include("posts.urls")),
+    path("chat/", include("chat.urls")),
 ]

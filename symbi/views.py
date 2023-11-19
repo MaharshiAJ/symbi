@@ -12,7 +12,16 @@ from posts.models import ActivityPost
 
 
 class HomePageView(generic.TemplateView):
+    model = ActivityPost
     template_name = "symbi/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["all_posts"] = ActivityPost.objects.filter(
+            status=ActivityPost.PostStatus.PUBLISHED
+        )
+        print(context["all_posts"].count)
+        return context
 
 
 class LandingPageView(generic.TemplateView):

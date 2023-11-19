@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ActivityPost
+
+
+@admin.register(ActivityPost)
+class ActivityPostAdmin(admin.ModelAdmin):
+    list_display = ["title", "description"]
+    search_fields = ["title"]

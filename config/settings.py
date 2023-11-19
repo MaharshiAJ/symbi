@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django_browser_reload",
     "symbi.apps.SymbiConfig",
     "posts.apps.PostsConfig",
+    "chat.apps.ChatConfig",
 ]
 
 MIDDLEWARE = [
