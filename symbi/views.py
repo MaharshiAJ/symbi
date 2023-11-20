@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import LoginForm, SignupForm
 from .models import Connection, SymbiUser
-from posts.models import ActivityPost
+from posts.models import ActivityPost, Comment
 
 
 class HomePageView(generic.TemplateView):

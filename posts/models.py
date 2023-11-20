@@ -48,3 +48,15 @@ class ActivityPost(models.Model):
             )
             & models.Q(status=ActivityPost.PostStatus.PUBLISHED)
         )
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(
+        ActivityPost, on_delete=models.CASCADE, related_name="comments"
+    )
+    poster = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.content

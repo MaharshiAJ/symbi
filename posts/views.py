@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 import django.views.generic as generic
 
-from .forms import NewPostForm
-from .models import ActivityPost
+from .forms import EditPostForm, NewPostForm
+from .models import ActivityPost, Comment
+from symbi.models import SymbiUser
 
 
 class CreatePostView(generic.CreateView):
@@ -42,25 +43,68 @@ class PostDetailsView(generic.DetailView):
     slug_field = "title"
     slug_url_kwarg = "title"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["comments"] = Comment.objects.filter(post=self.object).order_by(
+            "-timestamp"
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        new_comment = self.request.POST.get("new_comment")
+        poster = SymbiUser(username=self.kwargs["poster"])
+        post = ActivityPost(poster=poster, pk=self.kwargs["pk"])
+        Comment.objects.create(poster=request.user, post=post, content=new_comment)
+        return redirect(
+            reverse_lazy(
+                "posts:post_details",
+                kwargs={
+                    "poster": poster.username,
+                    "pk": post.id,
+                },
+            )
+        )
+
 
 class EditPostView(generic.UpdateView):
     model = ActivityPost
     template_name = "posts/edit_post.html"
-    form_class = NewPostForm
-    slug_field = "title"
-    slug_url_kwarg = "title"
+    form_class = EditPostForm
 
     def get_success_url(self):
+        post = get_object_or_404(
+            ActivityPost,
+            poster__username=self.kwargs["poster"],
+            pk=self.kwargs["pk"],
+        )
         return reverse_lazy(
             "posts:post_details",
             kwargs={
-                "poster": self.object.poster.username,
-                "title": self.object.title,
+                "poster": post.poster.username,
+                "pk": post.id,
             },
         )
 
-    def post(request, *args, **kwargs):
-        pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["post"] = get_object_or_404(
+            ActivityPost,
+            poster__username=self.kwargs["poster"],
+            pk=self.kwargs["pk"],
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        post = get_object_or_404(
+            ActivityPost,
+            poster__username=self.kwargs["poster"],
+            pk=self.kwargs["pk"],
+        )
+        post.title = request.POST.get("title")
+        post.description = request.POST.get("description")
+        post.tags.set(request.POST.getlist("tags"))
+        post.save()
+        return redirect(self.get_success_url())
 
 
 class DeletePostView(generic.DeleteView):
@@ -69,3 +113,50 @@ class DeletePostView(generic.DeleteView):
     slug_field = "title"
     slug_url_kwarg = "title"
     success_url = reverse_lazy("posts:home")
+
+
+class DeleteCommentView(generic.View):
+    def get(self, request, *args, **kwargs):
+        post = ActivityPost(
+            poster__username=self.kwargs["post_poster"], pk=self.kwargs["post_pk"]
+        )
+        comment = Comment.objects.get(
+            poster__username=self.kwargs["comment_poster"], pk=self.kwargs["comment_pk"]
+        )
+        comment.delete()
+        return redirect(
+            reverse_lazy(
+                "posts:post_details",
+                kwargs={
+                    "poster": post.poster.username,
+                    "pk": post.id,
+                },
+            )
+        )
+
+
+class EditCommentView(generic.View):
+    def post(self, request, *args, **kwargs):
+        post = ActivityPost(
+            poster__username=self.kwargs["post_poster"], pk=self.kwargs["post_pk"]
+        )
+        comment = Comment.objects.get(
+            poster__username=self.kwargs["comment_poster"], pk=self.kwargs["comment_pk"]
+        )
+        edited_comment = request.POST.get("edited_comment")
+        comment.content = edited_comment
+        comment.save()
+        return redirect(
+            reverse_lazy(
+                "posts:post_details",
+                kwargs={
+                    "poster": post.poster.username,
+                    "pk": post.id,
+                },
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["edit_comment"] = False
+        return context

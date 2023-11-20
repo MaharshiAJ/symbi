@@ -23,9 +23,9 @@
                  stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
             </svg>
-            <span>TODO: Num Post Comments</span>
+            <span>{{ post.comments.count }}</span>
         </div>
-        <a href="{% url 'posts:post_details' poster=post.poster title=post.title %}"
+        <a href="{% url 'posts:post_details' poster=post.poster pk=post.id %}"
            class="inline-flex items-center justify-center w-full px-6 py-3 mb-2 text-sm border-blue-600 border text-blue-600 bg-white rounded-md hover:bg-gray-100 sm:w-auto sm:mb-0"
            data-primary="green-400"
            data-rounded="rounded-2xl"
