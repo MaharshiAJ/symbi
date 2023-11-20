@@ -23,7 +23,7 @@
 
 5. In the Symbi directory, create a virtual environment and activate it
 
-- `virtualenv .env`
+- `virtualenv .venv`
 - on Mac: `source .env/bin/activate`
 - on Windows: `.env/Scripts/activate`
 

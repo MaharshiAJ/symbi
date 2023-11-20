@@ -8,14 +8,16 @@ class NewPostForm(forms.ModelForm):
     title = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                "class": "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                "class": """px-4 py-2 border focus:ring-gray-500 focus:border-gray-900
+                w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"""
             }
         )
     )
     description = forms.CharField(
         widget=forms.Textarea(
             attrs={
-                "class": "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"
+                "class": """px-4 py-2 border focus:ring-gray-500 focus:border-gray-900
+                w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600"""
             }
         )
     )
@@ -37,7 +39,8 @@ class EditPostForm(forms.ModelForm):
     title = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                "class": "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600",
+                "class": """px-4 py-2 border focus:ring-gray-500 focus:border-gray-900
+                w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600""",
                 "name": "title",
             }
         )
@@ -45,7 +48,8 @@ class EditPostForm(forms.ModelForm):
     description = forms.CharField(
         widget=forms.Textarea(
             attrs={
-                "class": "px-4 py-2 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600",
+                "class": """px-4 py-2 border focus:ring-gray-500 focus:border-gray-900
+                w-full sm:text-sm border-gray-300 rounded-md focus:outline-none text-gray-600""",
                 "name": "description",
             }
         )

@@ -4,11 +4,10 @@ import django.views.generic as generic
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
 
 from .forms import LoginForm, SignupForm
 from .models import Connection, SymbiUser
-from posts.models import ActivityPost, Comment
+from posts.models import ActivityPost
 
 
 class HomePageView(generic.ListView):
@@ -105,7 +104,7 @@ class RequestConnectionView(generic.View):
         requester = get_object_or_404(SymbiUser, username=self.request.user)
         receiver = get_object_or_404(SymbiUser, username=self.kwargs["receiver"])
 
-        if not Connection.are_connected(user, receiver):
+        if not Connection.are_connected(requester, receiver):
             Connection.objects.create(
                 requester=requester,
                 receiver=receiver,
