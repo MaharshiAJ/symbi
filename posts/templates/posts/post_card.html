@@ -10,6 +10,7 @@
             <div class="text-xs text-neutral-500">Posted on: {{ post.timestamp.date }}</div>
         </div>
     </div>
+    <div class="text-base text-slate-700">Posted by: {{ post.poster.username|capfirst }}</div>
     <div class="mt-4 mb-6">
         <div class="text-neutral-600">{{ post.description }}</div>
     </div>

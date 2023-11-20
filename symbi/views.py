@@ -11,16 +11,27 @@ from .models import Connection, SymbiUser
 from posts.models import ActivityPost, Comment
 
 
-class HomePageView(generic.TemplateView):
+class HomePageView(generic.ListView):
     model = ActivityPost
     template_name = "symbi/home.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["all_posts"] = ActivityPost.objects.filter(
-            status=ActivityPost.PostStatus.PUBLISHED
+        # Get posts where the users interests is in the posts tags
+        context["interests_posts"] = ActivityPost.objects.filter(
+            tags__in=self.request.user.interests.all()
         )
-        print(context["all_posts"].count)
+        user_connections = Connection.get_active_connections(self.request.user)
+        connected_users = [
+            connection.receiver
+            if connection.receiver != self.request.user
+            else connection.requester
+            for connection in user_connections
+        ]
+        # Get posts where the users connections is in the posts poster
+        context["connection_posts"] = ActivityPost.objects.filter(
+            poster__in=connected_users
+        )
         return context
 
 
@@ -54,10 +65,6 @@ class SignupView(generic.FormView):
                     messages.error(request, f"{field.capitalize()}: {error}")
 
             return render(request, "symbi/signup.html", {"form": form})
-
-
-class HomePageView(generic.TemplateView):
-    template_name = "symbi/home.html"
 
 
 class ProfilePageView(generic.DetailView):
